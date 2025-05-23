@@ -6,7 +6,7 @@ from .forms import OrderModelForm,CommentModelForm,ProductModelForm
 from django.contrib import messages
 from django.db.models import Avg
 from django.contrib.auth.decorators import login_required
-
+from .utils import get_filter
 
 
 # Create your views here.
@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import login_required
 def index(request,category_id = None):
     categories = Category.objects.all()
     search_query = request.GET.get('q','')
+    filter_type = request.GET.get('filter','')
+    
 
     if category_id:
         products = Product.objects.filter(category = category_id)
@@ -25,6 +27,11 @@ def index(request,category_id = None):
         products = products.filter(name__icontains = search_query)
         
     products = products.annotate(avg_rating = Avg('comments__rating'))
+    
+    products = get_filter(filter_type,products)
+    
+    
+    
     
     
     context = {
