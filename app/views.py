@@ -44,7 +44,11 @@ def index(request,category_id = None):
 def product_detail(request,product_id):
     try:
         product = Product.objects.get(id = product_id)
-        context = {'product':product}
+        related_products = Product.objects.filter(category = product.category).exclude(id=product.id)
+        context = {
+            'product':product,
+            'related_products':related_products
+            }
         return render(request,'app/detail.html',context)
     except Product.DoesNotExist:
         return HttpResponse('Product Not Found')
